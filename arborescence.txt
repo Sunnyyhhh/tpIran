@@ -1,0 +1,25 @@
+/mon-projet-iran
+├── /admin
+│   ├── index.php
+│   ├── edit.php
+│   ├── save.php
+│   ├── delete.php          ← à ajouter (suppression article)
+│   └── logout.php          ← à ajouter (déconnexion session)
+├── /config
+│   └── db.php
+├── /public
+│   ├── /css
+│   ├── /js
+│   └── /uploads
+├── /includes
+│   ├── header.php
+│   ├── footer.php
+│   └── auth.php            ← à ajouter (vérification session, protège /admin)
+├── index.php
+├── article.php
+├── .htaccess
+├── docker-compose.yml
+├── Dockerfile
+├── /sql
+│   └── init.sql            ← à ajouter (schéma BDD + données de test)
+└── README.md               ← à ajouter (user/pass par défaut, instructions)
