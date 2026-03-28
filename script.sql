@@ -1,137 +1,139 @@
-CREATE TABLE IF NOT EXISTS wp_users (
+-- =============================================
+-- BASE DE DONNÉES : Guerre en Iran 2026
+-- =============================================
+
+CREATE DATABASE IF NOT EXISTS iran_war_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE iran_war_db;
+
+-- ─────────────────────────────────────────
+-- TABLE : Utilisateurs (backoffice)
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS users (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    username    VARCHAR(60)  NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL,
+    role        ENUM('admin', 'editor') DEFAULT 'editor',
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ─────────────────────────────────────────
+-- TABLE : Catégories
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS categories (
+    id      INT AUTO_INCREMENT PRIMARY KEY,
+    name    VARCHAR(100) NOT NULL UNIQUE,
+    slug    VARCHAR(120) NOT NULL UNIQUE
+);
+
+-- ─────────────────────────────────────────
+-- TABLE : Articles
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS articles (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    username        VARCHAR(60) NOT NULL UNIQUE,
-    password        VARCHAR(255) NOT NULL,           -- hashé (jamais en clair)
-    email           VARCHAR(100) NOT NULL UNIQUE,
-    role            VARCHAR(20) DEFAULT 'author',    -- admin, editor, author
+    id_category     INT NULL,
+    id_user         INT NOT NULL,
+    title           VARCHAR(255) NOT NULL,
+    slug            VARCHAR(255) NOT NULL UNIQUE,
+    content         LONGTEXT NOT NULL,
+    excerpt         TEXT NULL,
+    image           VARCHAR(500) NULL,
+    image_alt       VARCHAR(255) NULL,
+    status          ENUM('draft', 'published') DEFAULT 'draft',
+    published_at    DATETIME NULL,
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_category) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_user)     REFERENCES users(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS wp_categories (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    category_name   VARCHAR(100) NOT NULL UNIQUE,
-    slug            VARCHAR(120) NOT NULL UNIQUE,    -- pour URL propre (ex: conflit-militaire)
-    description     TEXT NULL,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS wp_posts (
-    id                  INT AUTO_INCREMENT PRIMARY KEY,
-    id_category         INT NULL,
-    id_user             INT NOT NULL,                    -- auteur de l'article
-    title               VARCHAR(255) NOT NULL,
-    slug                VARCHAR(255) NOT NULL UNIQUE,    -- URL normalisée (très important pour le prof)
-    content             LONGTEXT NOT NULL,                -- contenu avec H2, H3...
-    excerpt             TEXT NULL,                       -- résumé pour la page d'accueil
-    featured_image      VARCHAR(500) NULL,               -- chemin de l'image mise en avant
-    image_alt           VARCHAR(255) NULL,               -- texte alternatif (SEO)
-    status              ENUM('draft', 'published', 'archived') DEFAULT 'draft',
-    published_at        DATETIME NULL,                    -- date de publication réelle
-    created_at          DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at          DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (id_category) REFERENCES wp_categories(id) ON DELETE SET NULL,
-    FOREIGN KEY (id_user)     REFERENCES wp_users(id) ON DELETE RESTRICT
-);
-
-CREATE INDEX idx_posts_category ON wp_posts(id_category);
-CREATE INDEX idx_posts_status ON wp_posts(status);
-CREATE INDEX idx_posts_published ON wp_posts(published_at);
-CREATE INDEX idx_posts_slug ON wp_posts(slug);
+-- Index pour les performances et le SEO
+CREATE INDEX idx_slug      ON articles(slug);
+CREATE INDEX idx_status    ON articles(status);
+CREATE INDEX idx_category  ON articles(id_category);
 
 -- =============================================
--- SCRIPT DE DONNÉES DE TEST - Guerre en Iran 2026
--- À exécuter dans phpMyAdmin
+-- DONNÉES DE TEST
 -- =============================================
 
-USE wordpress;
+-- Admin par défaut (mdp : admin1234)
+INSERT INTO users (username, password, role) VALUES
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
+('redacteur', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'editor');
+-- ⚠️  Les deux comptes ont le mot de passe : password
+-- Pour admin1234, remplace le hash via : password_hash('admin1234', PASSWORD_BCRYPT)
 
--- 1. Insertion des catégories
-INSERT INTO wp_terms (name, slug, term_group) VALUES
-('Conflit militaire', 'conflit-militaire', 0),
-('Impacts humanitaires', 'impacts-humanitaires', 0),
-('Chronologie', 'chronologie', 0),
-('Réactions internationales', 'reactions-internationales', 0),
-('Analyse géopolitique', 'analyse-geopolitique', 0);
+-- Catégories
+INSERT INTO categories (name, slug) VALUES
+('Conflit militaire',        'conflit-militaire'),
+('Humanitaire',              'humanitaire'),
+('Chronologie',              'chronologie'),
+('Réactions internationales','reactions-internationales'),
+('Économie',                 'economie');
 
--- Récupération des term_taxonomy_id pour les catégories
-INSERT INTO wp_term_taxonomy (term_id, taxonomy, description, parent, count)
-SELECT term_id, 'category', '', 0, 0 FROM wp_terms 
-WHERE slug IN ('conflit-militaire', 'impacts-humanitaires', 'chronologie', 'reactions-internationales', 'analyse-geopolitique');
+-- Articles
+INSERT INTO articles (id_category, id_user, title, slug, content, excerpt, image_alt, status, published_at) VALUES
 
--- 2. Insertion des 8 articles (posts)
-INSERT INTO wp_posts 
-(post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, post_name, post_modified, post_modified_gmt, post_type, comment_count)
-VALUES
+(1, 1,
+'Explosion à Téhéran : 87 morts',
+'explosion-teheran-87-morts',
+'<h2>Contexte</h2><p>Une explosion a secoué le centre de Téhéran le 23 mars 2026.</p><h3>Bilan</h3><p>87 morts et plus de 200 blessés selon les autorités iraniennes.</p>',
+'Une explosion meurtrière frappe le centre de Téhéran.',
+'Vue aérienne des destructions à Téhéran',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Contexte de l\'attaque</h2><p>Une puissante explosion a secoué le centre-ville de Téhéran dans la nuit du 23 mars 2026.</p><h3>Conséquences immédiates</h3><p>Les secours sont toujours à l\'œuvre sur place.</p>', 
-'Explosion massive à Téhéran : bilan provisoire de 87 morts', 
-'Une puissante explosion a secoué le centre de Téhéran.', 
-'publish', 'explosion-teheran-87-morts', NOW(), NOW(), 'post', 0),
+(3, 1,
+'Les 10 jours qui ont tout changé',
+'chronologie-10-jours',
+'<h2>15 mars : Déclenchement</h2><p>Les premières frappes ont eu lieu dans la nuit du 15 mars.</p><h3>20 mars : Escalade</h3><p>L\'escalade s\'est accélérée avec l\'entrée de nouveaux acteurs.</p>',
+'Retour sur les 10 jours qui ont fait basculer le conflit.',
+'Carte du Moyen-Orient avec les zones de conflit',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Les événements clés</h2><p>Retour détaillé sur la succession rapide d’événements qui ont mené à l’escalade actuelle.</p><h3>15 mars : Déclenchement</h3><p>...</p>', 
-'Chronologie : Les 10 jours qui ont fait basculer le Moyen-Orient', 
-'Résumé des 10 jours critiques du conflit.', 
-'publish', 'chronologie-10-jours-moyen-orient', NOW(), NOW(), 'post', 0),
+(2, 1,
+'2 millions de déplacés en Iran',
+'deux-millions-deplaces-iran',
+'<h2>Crise humanitaire</h2><p>Selon l\'ONU, plus de 2 millions de personnes ont fui les zones de combat.</p><h3>Aide internationale</h3><p>Plusieurs ONG sont mobilisées sur le terrain.</p>',
+'La crise humanitaire s\'aggrave, 2 millions de déplacés.',
+'Camp de réfugiés iraniens',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Crise humanitaire en cours</h2><p>Selon l’ONU, plus de 2 millions de personnes ont été déplacées internes en Iran.</p>', 
-'Plus de 2 millions de déplacés internes en Iran selon l’ONU', 
-'La crise humanitaire s’aggrave rapidement.', 
-'publish', 'deux-millions-deplaces-iran-onu', NOW(), NOW(), 'post', 0),
+(4, 1,
+'Les États-Unis imposent de nouvelles sanctions',
+'sanctions-usa-iran-2026',
+'<h2>Nouvelles sanctions</h2><p>Washington a annoncé un paquet de sanctions visant le pétrole et les banques iraniennes.</p><h3>Réaction de Téhéran</h3><p>L\'Iran a qualifié ces mesures d\'acte de guerre économique.</p>',
+'Washington durcit sa position avec de nouvelles sanctions.',
+'Siège du département d\'État américain',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Nouvelles sanctions</h2><p>Washington a annoncé un nouveau paquet de sanctions sévères visant le secteur pétrolier et bancaire iranien.</p>', 
-'Les États-Unis imposent de nouvelles sanctions économiques sévères', 
-'Washington durcit sa position.', 
-'publish', 'etats-unis-nouvelles-sanctions-iran', NOW(), NOW(), 'post', 0),
+(1, 1,
+'Drones sur la base d\'Ispahan',
+'attaque-drones-ispahan',
+'<h2>Attaque nocturne</h2><p>Des drones non identifiés ont visé une base militaire près d\'Ispahan.</p><h3>Revendication</h3><p>Aucun groupe n\'a revendiqué l\'attaque à ce stade.</p>',
+'Une base militaire iranienne visée par des drones.',
+'Photo satellite de la base militaire d\'Ispahan',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Attaque de drones</h2><p>Des drones non identifiés ont visé une base militaire stratégique près d’Ispahan.</p>', 
-'Attaque de drones sur une base militaire près d’Ispahan', 
-'Une nouvelle escalade dans le conflit.', 
-'publish', 'attaque-drones-base-ispahan', NOW(), NOW(), 'post', 0),
+(4, 1,
+'Russie et Chine appellent à la paix',
+'russie-chine-desescalade',
+'<h2>Position commune</h2><p>Moscou et Pékin ont publié une déclaration commune appelant à la désescalade.</p><h3>Proposition de médiation</h3><p>Les deux pays proposent d\'accueillir des négociations.</p>',
+'Moscou et Pékin demandent une désescalade immédiate.',
+'Drapeaux russe et chinois à l\'ONU',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Position russo-chinoise</h2><p>Moscou et Pékin appellent à une désescalade immédiate et à la reprise des négociations.</p>', 
-'La Russie et la Chine appellent à une désescalade immédiate', 
-'Les deux puissances demandent le dialogue.', 
-'publish', 'russie-chine-desescalade-iran', NOW(), NOW(), 'post', 0),
+(5, 1,
+'Le rial perd 40% en une semaine',
+'rial-iranien-chute-40-pourcent',
+'<h2>Effondrement monétaire</h2><p>Le rial iranien a perdu 40% de sa valeur en seulement 7 jours.</p><h3>Conséquences</h3><p>Les prix des denrées de base ont doublé dans plusieurs villes.</p>',
+'L\'économie iranienne s\'effondre, le rial en chute libre.',
+'Graphique de la chute du rial iranien',
+'published', NOW()),
 
-(1, NOW(), NOW(), 
-'<h2>Effondrement économique</h2><p>Le rial iranien a perdu près de 40% de sa valeur en une seule semaine.</p>', 
-'Crise économique : Le rial iranien perd 40% de sa valeur en une semaine', 
-'L’économie iranienne est durement touchée.', 
-'publish', 'rial-iranien-perte-valeur', NOW(), NOW(), 'post', 0),
-
-(1, NOW(), NOW(), 
-'<h2>Analyse des experts</h2><p>Le 15 mars 2026 marque le début officiel du conflit selon la majorité des observateurs internationaux.</p>', 
-'15 mars 2026 : Début officiel du conflit selon les experts', 
-'Que s’est-il vraiment passé ce jour-là ?', 
-'publish', '15-mars-debut-conflit-iran', NOW(), NOW(), 'post', 0);
-
--- 3. Association des articles aux catégories (à adapter selon l'ordre d'insertion)
--- Note : Les IDs des posts commencent généralement après les pages existantes (souvent à partir de 5 ou 6).
--- Exécute d'abord le script ci-dessus, puis ajuste les IDs des posts ci-dessous selon ce que tu vois dans phpMyAdmin (wp_posts).
-
--- Exemple d'association (remplace les IDs des posts par les vrais IDs après insertion) :
--- Supposons que les nouveaux posts ont les IDs : 10,11,12,13,14,15,16,17
-
-INSERT INTO wp_term_relationships (object_id, term_taxonomy_id, term_order) 
-SELECT p.ID, tt.term_taxonomy_id, 0
-FROM wp_posts p
-JOIN wp_term_taxonomy tt ON tt.taxonomy = 'category'
-WHERE p.post_name IN (
-    'explosion-teheran-87-morts', 
-    'chronologie-10-jours-moyen-orient',
-    'deux-millions-deplaces-iran-onu',
-    'etats-unis-nouvelles-sanctions-iran',
-    'attaque-drones-base-ispahan',
-    'russie-chine-desescalade-iran',
-    'rial-iranien-perte-valeur',
-    '15-mars-debut-conflit-iran'
-)
-AND tt.term_id IN (SELECT term_id FROM wp_terms WHERE slug IN ('conflit-militaire', 'chronologie', 'impacts-humanitaires', 'reactions-internationales', 'analyse-geopolitique'));
+(3, 1,
+'15 mars 2026 : date officielle du début du conflit',
+'15-mars-2026-debut-conflit',
+'<h2>Analyse</h2><p>Les experts s\'accordent sur le 15 mars comme date de déclenchement officiel.</p><h3>Causes profondes</h3><p>Les tensions couvaient depuis plusieurs années.</p>',
+'Le 15 mars 2026 retenu comme date officielle du début du conflit.',
+'Archives historiques sur le conflit iranien',
+'published', NOW());
