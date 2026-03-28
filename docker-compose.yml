@@ -1,34 +1,78 @@
 version: '3.8'
 
 services:
+
+  # ─────────────────────────────────────────
+  # Application PHP + Apache
+  # FrontOffice : http://localhost
+  # BackOffice  : http://localhost/admin
+  # ─────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iran_app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html          
+      - uploads_data:/var/www/html/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: iran_war_db
+      DB_USER: iran_user
+      DB_PASS: iran_pass_2026
+    networks:
+      - iran_net
+
+
   db:
     image: mysql:8.0
-    container_name: wp_db
-    restart: always
+    container_name: iran_db
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wpuser
-      MYSQL_PASSWORD: wppassword
+      MYSQL_ROOT_PASSWORD: root2026
+      MYSQL_DATABASE: iran_war_db
+      MYSQL_USER: iran_user
+      MYSQL_PASSWORD: iran_pass_2026
     volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql   # Init BDD auto au 1er lancement
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"       # Accès depuis DBeaver / TablePlus si besoin
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "iran_user", "-piran_pass_2026"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iran_net
 
-  wordpress:
-    image: wordpress:latest
-    container_name: wp_site
-    restart: always
-    depends_on:
-      - db
+ 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: iran_phpmyadmin
+    restart: unless-stopped
     ports:
       - "8080:80"
     environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: wpuser
-      WORDPRESS_DB_PASSWORD: wppassword
-      WORDPRESS_DB_NAME: wordpress
-    volumes:
-      - wp_data:/var/www/html
+      PMA_HOST: db
+      PMA_USER: iran_user
+      PMA_PASSWORD: iran_pass_2026
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - iran_net
 
 volumes:
   db_data:
-  wp_data:
+  uploads_data:
+
+networks:
+  iran_net:
+    driver: bridge
