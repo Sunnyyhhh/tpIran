@@ -1,19 +1,48 @@
 # =============================================
-# URL Rewriting - FrontOffice Iran War 2026
+# URL Rewriting - Iran War 2026
 # =============================================
 
 RewriteEngine On
 RewriteBase /
 
-# Ne pas reecrire les fichiers et dossiers existants
+# =============================================
+# FrontOffice
+# =============================================
+
+# Page d'accueil → front/index.php
+RewriteRule ^$ front/index.php [L]
+
+# /article/mon-slug → front/article.php?slug=mon-slug
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^article/([a-z0-9\-]+)/?$ front/article.php?slug=$1 [L,QSA]
 
-# /article/mon-slug → article.php?slug=mon-slug
-RewriteRule ^article/([a-z0-9\-]+)/?$ article.php?slug=$1 [L,QSA]
+# /categorie/mon-slug → front/categorie.php?slug=mon-slug
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^categorie/([a-z0-9\-]+)/?$ front/categorie.php?slug=$1 [L,QSA]
 
-# /categorie/mon-slug → categorie.php?slug=mon-slug
-RewriteRule ^categorie/([a-z0-9\-]+)/?$ categorie.php?slug=$1 [L,QSA]
+# =============================================
+# BackOffice
+# =============================================
+
+# /back → back/index.php (dashboard)
+RewriteRule ^back/?$ back/index.php [L]
+
+# /back/login → back/login.php
+RewriteRule ^back/login/?$ back/login.php [L]
+
+# /back/logout → back/logout.php
+RewriteRule ^back/logout/?$ back/logout.php [L]
+
+# /back/edit → back/edit.php
+RewriteRule ^back/edit/?$ back/edit.php [L,QSA]
+
+# /back/save → back/save.php
+RewriteRule ^back/save/?$ back/save.php [L]
+
+# /back/delete → back/delete.php
+RewriteRule ^back/delete/?$ back/delete.php [L,QSA]
 
 # =============================================
 # Securite
@@ -24,8 +53,11 @@ RewriteRule ^categorie/([a-z0-9\-]+)/?$ categorie.php?slug=$1 [L,QSA]
     Require all denied
 </FilesMatch>
 
-# Bloquer l'acces au dossier config via rewrite
+# Bloquer l'acces au dossier config
 RewriteRule ^config/ - [F,L]
+
+# Bloquer l'acces au dossier includes
+RewriteRule ^includes/ - [F,L]
 
 # =============================================
 # Performance
