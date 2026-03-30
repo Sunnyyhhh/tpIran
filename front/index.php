@@ -3,7 +3,7 @@
  * Page d'accueil - Liste des articles
  */
 
-require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/../config/database.php';
 
 // Recuperer les articles publies
 $stmt = $pdo->prepare("
@@ -21,7 +21,7 @@ $articles = $stmt->fetchAll();
 $pageTitle = "Accueil";
 $pageDescription = "Suivez l'actualite du conflit en Iran 2026 : analyses, chronologie, reactions internationales.";
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <h1>Actualites sur la guerre en Iran</h1>
@@ -65,4 +65,4 @@ require_once __DIR__ . '/includes/header.php';
     <?php endif; ?>
 </section>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

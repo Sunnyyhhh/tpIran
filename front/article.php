@@ -3,7 +3,7 @@
  * Page detail article
  */
 
-require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/../config/database.php';
 
 // Recuperer le slug depuis l'URL
 $slug = $_GET['slug'] ?? null;
@@ -11,10 +11,10 @@ $slug = $_GET['slug'] ?? null;
 if (!$slug) {
     http_response_code(404);
     $pageTitle = "Article non trouve";
-    require_once __DIR__ . '/includes/header.php';
+    require_once __DIR__ . '/../includes/header.php';
     echo "<h1>Article non trouve</h1>";
     echo "<p>L'article demande n'existe pas. <a href='/'>Retour a l'accueil</a></p>";
-    require_once __DIR__ . '/includes/footer.php';
+    require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
 
@@ -32,10 +32,10 @@ $article = $stmt->fetch();
 if (!$article) {
     http_response_code(404);
     $pageTitle = "Article non trouve";
-    require_once __DIR__ . '/includes/header.php';
+    require_once __DIR__ . '/../includes/header.php';
     echo "<h1>Article non trouve</h1>";
     echo "<p>L'article demande n'existe pas. <a href='/'>Retour a l'accueil</a></p>";
-    require_once __DIR__ . '/includes/footer.php';
+    require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
 
@@ -45,7 +45,7 @@ $pageDescription = $article['excerpt'] ?? substr(strip_tags($article['content'])
 $pageImage = $article['image'] ?? null;
 $pageUrl = "http://" . $_SERVER['HTTP_HOST'] . "/article/" . $article['slug'];
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <article class="article-detail">
@@ -88,4 +88,4 @@ require_once __DIR__ . '/includes/header.php';
     </footer>
 </article>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

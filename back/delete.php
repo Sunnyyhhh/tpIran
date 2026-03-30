@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/database.php';
 
 $id = intval($_GET['id'] ?? 0);
 
 if (!$id) {
     $_SESSION['flash'] = ['type' => 'error', 'message' => 'Article introuvable.'];
-    header('Location: /admin/index.php');
+    header('Location: /back/index.php');
     exit;
 }
 
@@ -17,7 +17,7 @@ $article = $stmt->fetch();
 
 if (!$article) {
     $_SESSION['flash'] = ['type' => 'error', 'message' => 'Article introuvable.'];
-    header('Location: /admin/index.php');
+    header('Location: /back/index.php');
     exit;
 }
 
@@ -31,5 +31,5 @@ $stmt = $pdo->prepare("DELETE FROM articles WHERE id = ?");
 $stmt->execute([$id]);
 
 $_SESSION['flash'] = ['type' => 'success', 'message' => 'Article supprimé avec succès.'];
-header('Location: /admin/index.php');
+header('Location: /back/index.php');
 exit;

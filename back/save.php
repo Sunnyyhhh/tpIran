@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /admin/index.php');
+    header('Location: /back/index.php');
     exit;
 }
 
@@ -20,7 +20,7 @@ $user       = current_user();
 // --- Validation basique ---
 if (!$title || !$content) {
     $_SESSION['flash'] = ['type' => 'error', 'message' => 'Le titre et le contenu sont obligatoires.'];
-    $redirect = $id ? "/admin/edit.php?id=$id" : "/admin/edit.php";
+    $redirect = $id ? "/back/edit.php?id=$id" : "/back/edit.php";
     header("Location: $redirect");
     exit;
 }
@@ -62,7 +62,7 @@ if (!empty($_FILES['image']['name'])) {
 
     if (!in_array($mime, $allowed)) {
         $_SESSION['flash'] = ['type' => 'error', 'message' => 'Format image non autorisé (jpg, png, webp, gif).'];
-        header("Location: /admin/edit.php" . ($id ? "?id=$id" : ""));
+        header("Location: /back/edit.php" . ($id ? "?id=$id" : ""));
         exit;
     }
 
@@ -106,5 +106,5 @@ if ($id) {
     $_SESSION['flash'] = ['type' => 'success', 'message' => 'Article créé avec succès.'];
 }
 
-header('Location: /admin/index.php');
+header('Location: /back/index.php');
 exit;
