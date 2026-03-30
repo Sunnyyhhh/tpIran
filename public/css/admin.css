@@ -604,6 +604,20 @@ textarea { resize: vertical; min-height: 80px; }
 
 hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
 
+/* ── Table cells helpers ─────────── */
+.td-id { color: var(--muted); font-size: 0.78rem; }
+.td-empty { color: var(--muted); font-size: 0.8rem; }
+.td-author { color: var(--muted); font-size: 0.83rem; }
+.td-date { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+
+/* ── Edit page helpers ──────────── */
+.card-content { margin-bottom: 1.2rem; }
+.sidebar-cards { display: flex; flex-direction: column; gap: 1.2rem; }
+.required { color: var(--accent); }
+.card-info { font-size: 0.8rem; color: var(--muted); line-height: 1.8; }
+.card-info .info-value { color: var(--text); }
+.card-info .info-slug { color: var(--accent); }
+
 /* ── Responsive ─────────────────── */
 @media (max-width: 900px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }

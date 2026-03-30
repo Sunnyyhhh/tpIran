@@ -73,7 +73,7 @@ unset($_SESSION['flash']);
         </a>
 
         <div class="nav-label">Site</div>
-        <a href="/" target="_blank">
+        <a href="/">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
             Voir le site
         </a>
@@ -197,7 +197,7 @@ unset($_SESSION['flash']);
                 <tbody>
                     <?php foreach ($articles as $article): ?>
                     <tr>
-                        <td style="color:var(--muted);font-size:.78rem"><?= $article['id'] ?></td>
+                        <td class="td-id"><?= $article['id'] ?></td>
 
                         <td class="td-title">
                             <strong><?= htmlspecialchars($article['title']) ?></strong>
@@ -208,11 +208,11 @@ unset($_SESSION['flash']);
                             <?php if ($article['category_name']): ?>
                                 <span class="cat-badge"><?= htmlspecialchars($article['category_name']) ?></span>
                             <?php else: ?>
-                                <span style="color:var(--muted);font-size:.8rem">—</span>
+                                <span class="td-empty">—</span>
                             <?php endif; ?>
                         </td>
 
-                        <td style="color:var(--muted);font-size:.83rem">
+                        <td class="td-author">
                             <?= htmlspecialchars($article['author']) ?>
                         </td>
 
@@ -222,7 +222,7 @@ unset($_SESSION['flash']);
                             </span>
                         </td>
 
-                        <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">
+                        <td class="td-date">
                             <?= date('d/m/Y', strtotime($article['created_at'])) ?>
                         </td>
 
@@ -230,7 +230,7 @@ unset($_SESSION['flash']);
                             <div class="actions">
                                 <!-- Voir FO -->
                                 <a href="/article/<?= htmlspecialchars($article['slug']) ?>"
-                                   target="_blank" class="action-btn" title="Voir sur le site">
+                                   class="action-btn" title="Voir sur le site">
                                     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
                                 </a>
                                 <!-- Modifier -->

@@ -48,7 +48,7 @@ unset($_SESSION['flash']);
             Nouvel article
         </a>
         <div class="nav-label">Site</div>
-        <a href="/" target="_blank">
+        <a href="/">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
             Voir le site
         </a>
@@ -92,12 +92,12 @@ unset($_SESSION['flash']);
 
                 <!-- Colonne gauche : contenu principal -->
                 <div>
-                    <div class="card" style="margin-bottom:1.2rem">
+                    <div class="card card-content">
                         <div class="card-header">Contenu</div>
                         <div class="card-body">
 
                             <div class="field">
-                                <label for="title">Titre <span style="color:var(--accent)">*</span></label>
+                                <label for="title">Titre <span class="required">*</span></label>
                                 <input type="text" id="title" name="title" required
                                        placeholder="Titre de l'article"
                                        value="<?= htmlspecialchars($article['title'] ?? '') ?>">
@@ -110,7 +110,7 @@ unset($_SESSION['flash']);
                             </div>
 
                             <div class="field">
-                                <label>Contenu <span style="color:var(--accent)">*</span></label>
+                                <label>Contenu <span class="required">*</span></label>
                                 <div class="tinymce-wrap">
                                     <textarea id="content" name="content"><?= htmlspecialchars($article['content'] ?? '') ?></textarea>
                                 </div>
@@ -121,7 +121,7 @@ unset($_SESSION['flash']);
                 </div>
 
                 <!-- Colonne droite : paramètres -->
-                <div style="display:flex;flex-direction:column;gap:1.2rem">
+                <div class="sidebar-cards">
 
                     <!-- Catégorie -->
                     <div class="card">
@@ -170,10 +170,10 @@ unset($_SESSION['flash']);
                     <?php if ($article): ?>
                     <div class="card">
                         <div class="card-header">Informations</div>
-                        <div class="card-body" style="font-size:.8rem;color:var(--muted);line-height:1.8">
-                            <div>Créé le : <span style="color:var(--text)"><?= date('d/m/Y H:i', strtotime($article['created_at'])) ?></span></div>
-                            <div>Modifié le : <span style="color:var(--text)"><?= date('d/m/Y H:i', strtotime($article['updated_at'])) ?></span></div>
-                            <div>Slug : <span style="color:var(--accent)">/<?= htmlspecialchars($article['slug']) ?></span></div>
+                        <div class="card-body card-info">
+                            <div>Créé le : <span class="info-value"><?= date('d/m/Y H:i', strtotime($article['created_at'])) ?></span></div>
+                            <div>Modifié le : <span class="info-value"><?= date('d/m/Y H:i', strtotime($article['updated_at'])) ?></span></div>
+                            <div>Slug : <span class="info-slug">/<?= htmlspecialchars($article['slug']) ?></span></div>
                         </div>
                     </div>
                     <?php endif; ?>

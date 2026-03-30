@@ -1,11 +1,8 @@
 <?php
-/**
- * Page detail article
- */
+
 
 require_once __DIR__ . '/../config/database.php';
 
-// Recuperer le slug depuis l'URL
 $slug = $_GET['slug'] ?? null;
 
 if (!$slug) {
@@ -18,7 +15,6 @@ if (!$slug) {
     exit;
 }
 
-// Recuperer l'article
 $stmt = $pdo->prepare("
     SELECT a.*, c.name AS category_name, c.slug AS category_slug, u.username AS author
     FROM articles a
@@ -39,7 +35,6 @@ if (!$article) {
     exit;
 }
 
-// SEO dynamique
 $pageTitle = $article['title'];
 $pageDescription = $article['excerpt'] ?? substr(strip_tags($article['content']), 0, 160);
 $pageImage = $article['image'] ?? null;

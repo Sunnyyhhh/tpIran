@@ -7,17 +7,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// --- Récupération et nettoyage des champs ---
 $id         = intval($_POST['id'] ?? 0);
 $title      = trim($_POST['title']      ?? '');
-$content    = $_POST['content']         ?? '';   // HTML TinyMCE, pas d'htmlspecialchars
+$content    = $_POST['content']         ?? '';  
 $excerpt    = trim($_POST['excerpt']    ?? '');
 $image_alt  = trim($_POST['image_alt']  ?? '');
 $status     = in_array($_POST['status'] ?? '', ['draft','published']) ? $_POST['status'] : 'draft';
 $id_category= intval($_POST['id_category'] ?? 0) ?: null;
 $user       = current_user();
 
-// --- Validation basique ---
 if (!$title || !$content) {
     $_SESSION['flash'] = ['type' => 'error', 'message' => 'Le titre et le contenu sont obligatoires.'];
     $redirect = $id ? "/back/edit.php?id=$id" : "/back/edit.php";
@@ -25,7 +23,6 @@ if (!$title || !$content) {
     exit;
 }
 
-// --- Génération du slug ---
 function slugify(string $text): string {
     $text = mb_strtolower($text, 'UTF-8');
     $text = strtr($text, ['à'=>'a','â'=>'a','ä'=>'a','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e',
@@ -38,7 +35,6 @@ function slugify(string $text): string {
 
 $slug_base = slugify($title);
 
-// Slug unique : si modification, on exclut l'article en cours
 if ($id) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM articles WHERE slug = ? AND id != ?");
     $stmt->execute([$slug_base, $id]);
@@ -51,8 +47,7 @@ if ($stmt->fetchColumn() > 0) {
     $slug = $slug_base . '-' . time();
 }
 
-// --- Upload image ---
-$image_path = $_POST['existing_image'] ?? null; // conserver l'ancienne si pas de nouvelle
+$image_path = $_POST['existing_image'] ?? null; 
 
 if (!empty($_FILES['image']['name'])) {
     $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -75,11 +70,9 @@ if (!empty($_FILES['image']['name'])) {
     }
 }
 
-// --- INSERT ou UPDATE ---
 $published_at = ($status === 'published') ? date('Y-m-d H:i:s') : null;
 
 if ($id) {
-    // UPDATE
     $stmt = $pdo->prepare("
         UPDATE articles SET
             title        = ?,
@@ -97,7 +90,6 @@ if ($id) {
     $stmt->execute([$title, $slug, $content, $excerpt, $image_path, $image_alt, $status, $id_category, $published_at, $id]);
     $_SESSION['flash'] = ['type' => 'success', 'message' => 'Article modifié avec succès.'];
 } else {
-    // INSERT
     $stmt = $pdo->prepare("
         INSERT INTO articles (id_category, id_user, title, slug, content, excerpt, image, image_alt, status, published_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
