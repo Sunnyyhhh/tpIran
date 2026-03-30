@@ -1,6 +1,4 @@
 <?php
-// includes/auth.php
-// À inclure en haut de chaque page du /admin
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -11,7 +9,6 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-// Helper : utilisateur connecté
 function current_user(): array {
     return [
         'id'       => $_SESSION['user_id'],

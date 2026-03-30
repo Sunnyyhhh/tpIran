@@ -10,7 +10,7 @@ if (!$id) {
     exit;
 }
 
-// Vérifier que l'article existe
+//check article exist
 $stmt = $pdo->prepare("SELECT id, image FROM articles WHERE id = ?");
 $stmt->execute([$id]);
 $article = $stmt->fetch();
@@ -21,12 +21,12 @@ if (!$article) {
     exit;
 }
 
-// Supprimer l'image associée si elle existe
+//supp image
 if ($article['image'] && file_exists(__DIR__ . '/../public/uploads/' . basename($article['image']))) {
     unlink(__DIR__ . '/../public/uploads/' . basename($article['image']));
 }
 
-// Supprimer l'article
+//supp article
 $stmt = $pdo->prepare("DELETE FROM articles WHERE id = ?");
 $stmt->execute([$id]);
 

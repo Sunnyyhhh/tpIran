@@ -1,11 +1,8 @@
 <?php
-/**
- * Page d'accueil - Liste des articles
- */
+
 
 require_once __DIR__ . '/../config/database.php';
 
-// Recuperer les articles publies
 $stmt = $pdo->prepare("
     SELECT a.id, a.title, a.slug, a.excerpt, a.image, a.image_alt, a.published_at,
            c.name AS category_name, c.slug AS category_slug
@@ -17,7 +14,6 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $articles = $stmt->fetchAll();
 
-// SEO
 $pageTitle = "Accueil";
 $pageDescription = "Suivez l'actualite du conflit en Iran 2026 : analyses, chronologie, reactions internationales.";
 
