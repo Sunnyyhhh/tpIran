@@ -1,18 +1,15 @@
 <?php
-// admin/index.php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 
 $user = current_user();
 
-// ── Stats globales ──────────────────────────────────────────────
 $stats = [];
 $stats['total']     = $pdo->query("SELECT COUNT(*) FROM articles")->fetchColumn();
 $stats['published'] = $pdo->query("SELECT COUNT(*) FROM articles WHERE status='published'")->fetchColumn();
 $stats['draft']     = $pdo->query("SELECT COUNT(*) FROM articles WHERE status='draft'")->fetchColumn();
 $stats['categories']= $pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
 
-// ── Filtres ─────────────────────────────────────────────────────
 $filter_status   = $_GET['status']   ?? '';
 $filter_category = $_GET['category'] ?? '';
 $search          = trim($_GET['q']   ?? '');
@@ -37,10 +34,8 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $articles = $stmt->fetchAll();
 
-// ── Liste des catégories pour le filtre ─────────────────────────
 $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
 
-// ── Message flash ────────────────────────────────────────────────
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 ?>
@@ -54,7 +49,6 @@ unset($_SESSION['flash']);
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ═══════════════════════════════════════════ -->
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="dot"></div>
@@ -91,10 +85,8 @@ unset($_SESSION['flash']);
     </div>
 </aside>
 
-<!-- ═══ MAIN ═══════════════════════════════════════════════ -->
 <div class="main">
 
-    <!-- Topbar -->
     <div class="topbar">
         <h1>Tableau de bord</h1>
         <a href="/back/edit.php" class="btn btn-primary">
@@ -105,14 +97,12 @@ unset($_SESSION['flash']);
 
     <div class="content">
 
-        <!-- Flash -->
         <?php if ($flash): ?>
             <div class="flash <?= htmlspecialchars($flash['type']) ?>">
                 <?= htmlspecialchars($flash['message']) ?>
             </div>
         <?php endif; ?>
 
-        <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total articles</div>
@@ -132,7 +122,6 @@ unset($_SESSION['flash']);
             </div>
         </div>
 
-        <!-- Toolbar / Filtres -->
         <form method="GET" action="/back/index.php">
             <div class="toolbar">
                 <div class="search-wrap">
@@ -169,7 +158,6 @@ unset($_SESSION['flash']);
             </div>
         </form>
 
-        <!-- Table articles -->
         <div class="table-wrap">
             <div class="table-header">
                 <span class="table-title">Articles</span>
@@ -228,17 +216,14 @@ unset($_SESSION['flash']);
 
                         <td>
                             <div class="actions">
-                                <!-- Voir FO -->
                                 <a href="/article/<?= htmlspecialchars($article['slug']) ?>"
                                    class="action-btn" title="Voir sur le site">
                                     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
                                 </a>
-                                <!-- Modifier -->
                                 <a href="/back/edit.php?id=<?= $article['id'] ?>"
                                    class="action-btn" title="Modifier">
                                     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 </a>
-                                <!-- Supprimer -->
                                 <a href="/back/delete.php?id=<?= $article['id'] ?>"
                                    class="action-btn delete" title="Supprimer"
                                    onclick="return confirm('Supprimer cet article ?')">
@@ -253,8 +238,8 @@ unset($_SESSION['flash']);
             <?php endif; ?>
         </div>
 
-    </div><!-- /content -->
-</div><!-- /main -->
+    </div>
+</div>
 
 </body>
 </html>

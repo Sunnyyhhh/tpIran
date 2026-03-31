@@ -1,7 +1,3 @@
--- =============================================
--- BASE DE DONNÉES : Guerre en Iran 2026
--- =============================================
-
 CREATE DATABASE IF NOT EXISTS iran_war_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE iran_war_db;
 
@@ -47,7 +43,6 @@ CREATE TABLE IF NOT EXISTS articles (
     FOREIGN KEY (id_user)     REFERENCES users(id) ON DELETE RESTRICT
 );
 
--- Index pour les performances et le SEO
 CREATE INDEX idx_slug      ON articles(slug);
 CREATE INDEX idx_status    ON articles(status);
 CREATE INDEX idx_category  ON articles(id_category);
@@ -60,10 +55,8 @@ CREATE INDEX idx_category  ON articles(id_category);
 INSERT INTO users (username, password, role) VALUES
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
 ('redacteur', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'editor');
--- ⚠️  Les deux comptes ont le mot de passe : password
--- Pour admin1234, remplace le hash via : password_hash('admin1234', PASSWORD_BCRYPT)
 
--- Catégories
+-- Categories
 INSERT INTO categories (name, slug) VALUES
 ('Conflit militaire',        'conflit-militaire'),
 ('Humanitaire',              'humanitaire'),
